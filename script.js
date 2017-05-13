@@ -30,7 +30,9 @@ window.onload = () => {
 	document.body.appendChild(canvas);
 
 	// New Instances //
-	const newLine = new Line($width(5), $height(5), $width(1), $height(5), "yellow", false, canvas, ctx, mouseX, mouseY, "round");
+	
+	const backLine = new Line($width(2), $height(5), $width(.3), $height(90), "grey", false, canvas, ctx, mouseX, mouseY, "round");
+	const newLine = new Line($width(2), $height(5), $width(.3), $height(2), "yellow", false, canvas, ctx, mouseX, mouseY, "round");
 	// Draw Canvas with Interval //
 	setInterval(draw, 10);
 
@@ -77,9 +79,9 @@ document.onmousemove = (event) => {
   mouseY = event.clientY;
   newLine.mouseX = mouseX;
   newLine.mouseY = mouseY;
-  const minY = Math.floor($height(5));
-  const maxY = Math.floor($height(95) - newLine.height);
-  if(mouseDown){
+  let minY = Math.floor($height(5));
+  let maxY = Math.floor($height(95) - newLine.height);
+  if(mouseDown && mouseY < maxY && mouseY > minY){
   	newLine.y = (newLine.y < minY) ? minY : ((newLine.y > maxY) ? maxY : mouseY);  	
   }
   
@@ -95,8 +97,8 @@ window.onresize = ()=> {
 	
 	// reset size of instances for responsivity //
 
-	newLine.setSize($width(5), $height(5), $width(1), $height(5));
-	
+	newLine.setSize($width(2), $height(5), $width(0.3), $height(2));
+	backLine.setSize($width(2), $height(5), $width(0.3), $height(90));
 }
 
 
@@ -110,6 +112,7 @@ function draw() {
 	const canvas = $('#canvas');
 	ctx.fillStyle = "black";
 	ctx.fillRect(0, 0, width, height);
+	backLine.render();
 	newLine.render();
 
 }
@@ -124,10 +127,12 @@ function draw() {
 
 document.addEventListener('wheel', (event)=>{
 	event.preventDefault();
-	if(newLine.y < $height(100) - (newLine.height + 20) && event.deltaY > 0) {
+	let minY = Math.floor($height(5));
+  	let maxY = Math.floor($height(95) - newLine.height);
+	if(newLine.y < maxY && event.deltaY > 0) {
 	  newLine.y = Math.round(newLine.y) + 5 ;
 	} 
-	if(newLine.y > 20 && event.deltaY < 0) {
+	if(newLine.y > minY && event.deltaY < 0) {
 	  newLine.y = Math.round(newLine.y) - 5 ;
 	}
 })
