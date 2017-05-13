@@ -30,9 +30,7 @@ window.onload = () => {
 	document.body.appendChild(canvas);
 
 	// New Instances //
-
-	const newBox = new Box($width(5), $height(10), $width(10), $height(10), "blue", false, canvas, ctx, mouseX, mouseY);
-	
+	const newLine = new Line($width(5), $height(5), $width(1), $height(5), "yellow", false, canvas, ctx, mouseX, mouseY, "round");
 	// Draw Canvas with Interval //
 	setInterval(draw, 10);
 
@@ -77,10 +75,12 @@ function $text(percent, font){
 document.onmousemove = (event) => {
   mouseX = event.clientX;
   mouseY = event.clientY;
-  newBox.mouseX = mouseX;
-  newBox.mouseY = mouseY;
-  if(mouseDown && newBox.y < $height(100) && newBox.y > 0 ){
-  	newBox.y = mouseY - newBox.height/2;
+  newLine.mouseX = mouseX;
+  newLine.mouseY = mouseY;
+  const minY = Math.floor($height(5));
+  const maxY = Math.floor($height(95) - newLine.height);
+  if(mouseDown){
+  	newLine.y = (newLine.y < minY) ? minY : ((newLine.y > maxY) ? maxY : mouseY);  	
   }
   
  
@@ -91,11 +91,12 @@ document.onmousemove = (event) => {
 /*  Window On Resize  */
 /*____________________*/
 
-window.onresize = function() {
+window.onresize = ()=> {
 	
 	// reset size of instances for responsivity //
 
-	newBox.setSize($width(5), $height(10), $width(10), $height(10));
+	newLine.setSize($width(5), $height(5), $width(1), $height(5));
+	
 }
 
 
@@ -109,7 +110,7 @@ function draw() {
 	const canvas = $('#canvas');
 	ctx.fillStyle = "black";
 	ctx.fillRect(0, 0, width, height);
-	newBox.render();
+	newLine.render();
 
 }
 
@@ -123,36 +124,42 @@ function draw() {
 
 document.addEventListener('wheel', (event)=>{
 	event.preventDefault();
-	if(newBox.y < $height(100) - (newBox.height + 20) && event.deltaY > 0) {
-	  newBox.y = Math.round(newBox.y) + 5 ;
-	}
-	if(newBox.y > 20 && event.deltaY < 0) {
-	  newBox.y = Math.round(newBox.y) - 5 ;
+	if(newLine.y < $height(100) - (newLine.height + 20) && event.deltaY > 0) {
+	  newLine.y = Math.round(newLine.y) + 5 ;
+	} 
+	if(newLine.y > 20 && event.deltaY < 0) {
+	  newLine.y = Math.round(newLine.y) - 5 ;
 	}
 })
 
 /*  Mouse Click Listener  */
-/*
+
 document.addEventListener('click', (event)=>{
-	if(newBox.getBounds()) {
-		if(newBox.clicked) {
-			newBox.color = "blue";
-			newBox.clicked = false;
+	//console.log("click", newLine.x + (newLine.width/2), newLine.getBounds(), newLine.mouseX, newLine.y + newLine.height, mouseY );
+	if(newLine.getBounds()) {
+		console.log('inbounds');
+		if(newLine.clicked) {
+			
+			newLine.clicked = false;
 		} else {
-			newBox.color = "green";
-			newBox.clicked = true;
+			newLine.setColor('yellow');
+			newLine.clicked = true;
 		}
 		
 	}
 })
-*/
+
+/* Mouse Down Listener  */
+
 document.addEventListener('mousedown', (event)=>{
 	event.preventDefault();
 	event.stopPropagation();
-	if(newBox.getBounds()) {
+	if(newLine.getBounds()) {
 		mouseDown = true;
 	}
 }, false)
+
+/*  Mouse Up Listenere  */
 
 document.addEventListener('mouseup', (event)=>{
 	event.preventDefault();
@@ -160,5 +167,7 @@ document.addEventListener('mouseup', (event)=>{
 		mouseDown = false;
 	
 }, false)
+
+
 
 }
